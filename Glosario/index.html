@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glosario de Análisis Exploratorio y Visualización de Datos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* --- VARIABLES DE COLOR --- */
+        :root {
+            --primary-brand: #483C9A;
+            --bg-light: #ececec;
+            --text-dark: #333333;
+            --white: #ffffff;
+            --disabled-gray: #a0a0a0;
+            --disabled-bg: #e0e0e0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: radial-gradient(#d0d0d0 1px, transparent 1px);
+            background-size: 10px 10px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+            box-sizing: border-box;
+        }
+
+        .glossary-widget {
+            width: 100%;
+            max-width: 900px;
+            background: transparent;
+            position: relative; 
+        }
+
+        .instruction-wrapper {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 10px;
+        }
+
+        .instruction-badge {
+            background-color: var(--primary-brand);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: pulse-attention 2s infinite;
+        }
+
+        @keyframes pulse-attention {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(72, 60, 154, 0.4); }
+            70% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(72, 60, 154, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(72, 60, 154, 0); }
+        }
+
+        .glossary-header {
+            background-color: var(--primary-brand);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .glossary-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .glossary-body {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start; 
+        }
+
+        .tabs-container {
+            display: flex;
+            flex-direction: column;
+            width: 140px;
+            flex-shrink: 0;
+            background-color: var(--primary-brand);
+            border-radius: 15px;
+            padding: 10px 0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 20px; 
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--white);
+            border: none;
+            padding: 15px 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            outline: none;
+            position: relative;
+        }
+
+        .tab-btn:hover:not(.disabled) {
+            background-color: rgba(255,255,255,0.1);
+        }
+
+        .tab-btn.active {
+            background-color: var(--bg-light);
+            color: var(--primary-brand);
+            border-radius: 5px 0 0 5px;
+        }
+
+        .tab-btn.disabled {
+            color: var(--disabled-gray);
+            background-color: rgba(0, 0, 0, 0.15);
+            cursor: not-allowed;
+        }
+
+        .content-area {
+            flex-grow: 1;
+            background-color: var(--bg-light);
+            border-radius: 15px;
+            padding: 40px;
+            min-height: 450px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .definition-item {
+            margin-bottom: 30px;
+            padding-left: 20px;
+            border-left: 5px solid var(--primary-brand);
+        }
+
+        .definition-item h3 {
+            color: var(--primary-brand);
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            font-weight: 700;
+        }
+
+        .definition-item p {
+            color: var(--text-dark);
+            line-height: 1.6;
+            margin: 0;
+            text-align: left;
+        }
+
+        .hidden { display: none !important; }
+
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-group.animate-in .definition-item {
+            animation: slideUpFade 0.5s ease-out forwards;
+            opacity: 0; 
+        }
+
+        .content-group.animate-in .definition-item:nth-child(1) { animation-delay: 0.1s; }
+        .content-group.animate-in .definition-item:nth-child(2) { animation-delay: 0.2s; }
+        .content-group.animate-in .definition-item:nth-child(3) { animation-delay: 0.3s; }
+        .content-group.animate-in .definition-item:nth-child(4) { animation-delay: 0.4s; }
+        .content-group.animate-in .definition-item:nth-child(5) { animation-delay: 0.5s; }
+
+        @media (max-width: 768px) {
+            .glossary-body { flex-direction: column; }
+            .tabs-container { width: 100%; flex-direction: row; position: static; }
+            .tab-btn { flex: 1; border-bottom: none; border-right: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; }
+            .tab-btn.active { border-radius: 10px 10px 0 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="glossary-widget">
+    <div class="instruction-wrapper">
+        <div class="instruction-badge">
+            <span>👆</span> Haga Clic sobre los botones para ampliar la información
+        </div>
+    </div>
+
+    <div class="glossary-header">
+        <h1>Glosario de Análisis Exploratorio y Visualización de Datos</h1>
+    </div>
+
+    <div class="glossary-body">
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="filterContent('A-I', this)">A – I</button>
+            <button class="tab-btn" onclick="filterContent('J-R', this)">J – R</button>
+            <button class="tab-btn" onclick="filterContent('S-Z', this)">S – Z</button>
+        </div>
+
+        <div class="content-area">
+            <!-- Grupo A – I -->
+            <div class="content-group animate-in" id="group-A-I">
+                <div class="definition-item">
+                    <h3>Análisis Exploratorio de Datos (EDA)</h3>
+                    <p>Proceso inicial de análisis cuyo objetivo es comprender la estructura, características y patrones de un conjunto de datos. Incluye la identificación de valores atípicos, tendencias, correlaciones y distribuciones mediante estadísticas descriptivas y visualizaciones.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>Correlación</h3>
+                    <p>Medida estadística que indica el grado de relación entre dos variables. En análisis de datos se utiliza para identificar si los cambios en una variable están asociados con cambios en otra.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>DataFrame</h3>
+                    <p>Estructura de datos bidimensional utilizada en la biblioteca Pandas que permite almacenar y manipular datos en forma tabular, similar a una hoja de cálculo o tabla de base de datos.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>Distribución de datos</h3>
+                    <p>Forma en que se organizan o dispersan los valores de una variable dentro de un conjunto de datos. Puede representarse mediante histogramas, gráficos de densidad u otros métodos visuales.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>Gráfico de barras</h3>
+                    <p>Tipo de visualización que representa datos categóricos mediante barras rectangulares cuya longitud o altura corresponde a los valores representados.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>Gráfico de dispersión (Scatter Plot)</h3>
+                    <p>Representación gráfica que muestra la relación entre dos variables numéricas mediante puntos en un plano cartesiano. Es útil para identificar correlaciones o patrones entre variables.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>Histograma</h3>
+                    <p>Representación gráfica de la distribución de una variable numérica mediante intervalos o rangos de valores, permitiendo analizar la frecuencia de los datos.</p>
+                </div>
+            </div>
+
+            <!-- Grupo J – R -->
+            <div class="content-group hidden" id="group-J-R">
+                <div class="definition-item">
+                    <h3>Limpieza de datos</h3>
+                    <p>Proceso de detección y corrección de errores, inconsistencias o valores faltantes dentro de un conjunto de datos con el fin de mejorar su calidad para el análisis.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>Matplotlib</h3>
+                    <p>Biblioteca de Python utilizada para la creación de gráficos y visualizaciones de datos, ampliamente utilizada en análisis exploratorio y presentación de resultados.</p>
+                </div>
+            </div>
+
+            <!-- Grupo S – Z -->
+            <div class="content-group hidden" id="group-S-Z">
+                <div class="definition-item">
+                    <h3>Seaborn</h3>
+                    <p>Biblioteca de visualización basada en Matplotlib que facilita la creación de gráficos estadísticos más avanzados y estéticamente mejorados para análisis de datos.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>Variable categórica</h3>
+                    <p>Tipo de variable que representa categorías o grupos, como por ejemplo tipo de producto, región o categoría de cliente.</p>
+                </div>
+                <div class="definition-item">
+                    <h3>Variable numérica</h3>
+                    <p>Tipo de variable cuyos valores representan cantidades medibles y pueden utilizarse en operaciones matemáticas, como precios, edades o cantidades de ventas.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function filterContent(groupId, btnElement) {
+        if (btnElement.classList.contains('disabled')) return;
+
+        const groups = document.querySelectorAll('.content-group');
+        groups.forEach(group => {
+            group.classList.add('hidden');
+            group.classList.remove('animate-in');
+        });
+
+        const selectedGroup = document.getElementById('group-' + groupId);
+        if (selectedGroup) {
+            selectedGroup.classList.remove('hidden');
+            void selectedGroup.offsetWidth; 
+            selectedGroup.classList.add('animate-in');
+        }
+
+        const buttons = document.querySelectorAll('.tab-btn');
+        buttons.forEach(btn => btn.classList.remove('active'));
+        btnElement.classList.add('active');
+    }
+</script>
+
+</body>
+</html>
