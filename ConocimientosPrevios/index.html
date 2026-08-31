@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conocimientos Previos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-soft: #a394ff;
+            --secondary-soft: #6352cf;
+            --bg-dark: #483C9A;
+            --card-surface: rgba(72, 60, 154, 0.75);
+            --text-main: #f0edff;
+            --transition-smooth: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 80px 20px 40px;
+            box-sizing: border-box;
+        }
+
+        .instruction {
+            position: fixed;
+            top: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 30px;
+            border-radius: 30px;
+            border: 1px solid rgba(163, 148, 255, 0.3);
+            color: var(--primary-soft);
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            animation: floatAnim 4s ease-in-out infinite;
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+
+        @keyframes floatAnim {
+            0%, 100% {
+                transform: translateY(0);
+                opacity: 0.7;
+            }
+            50% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+
+        .grid-knowledge {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .flip-card {
+            background-color: transparent;
+            height: 250px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 20px;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Front Side */
+        .flip-card-front {
+            border: 1px solid rgba(163, 148, 255, 0.3);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .flip-card-front::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(30, 24, 76, 0.85), rgba(47, 37, 117, 0.90));
+            z-index: 1;
+            transition: var(--transition-smooth);
+        }
+
+        .flip-card:hover .flip-card-front::before {
+            background: linear-gradient(135deg, rgba(30, 24, 76, 0.70), rgba(47, 37, 117, 0.80));
+        }
+
+        .flip-card-front h4, .flip-card-front .click-hint {
+            position: relative;
+            z-index: 2;
+        }
+
+        .flip-card-front h4 {
+            margin: 0;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #ffffff;
+            text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .flip-card-front .click-hint {
+            font-size: 0.75rem;
+            color: var(--primary-soft);
+            margin-top: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Back Side */
+        .flip-card-back {
+            background: #1c1549;
+            border: 1px solid var(--primary-soft);
+            color: #e5e1fc;
+            transform: rotateY(180deg);
+            text-align: left;
+            font-size: 0.88rem;
+            line-height: 1.6;
+            overflow-y: auto;
+            justify-content: center;
+            box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .flip-card-back p {
+            margin: 0;
+            font-weight: 300;
+        }
+
+        .flip-card-back::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .flip-card-back::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="instruction">haga clic sobre las tarjetas para ampliar la información</div>
+
+    <div class="grid-knowledge">
+        
+        <!-- Tarjeta 1 -->
+        <div class="flip-card" onclick="toggleFlip(this)">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=600');">
+                    <h4>Fundamentos básicos de Python</h4>
+                    <div class="click-hint">Girar ↻</div>
+                </div>
+                <div class="flip-card-back">
+                    <p>comprensión de la sintaxis básica del lenguaje, incluyendo uso de variables, tipos de datos, estructuras de control (condicionales y ciclos) y ejecución de scripts simples.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 2 -->
+        <div class="flip-card" onclick="toggleFlip(this)">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('https://images.unsplash.com/photo-1516116211223-4258568f1013?auto=format&fit=crop&q=80&w=600');">
+                    <h4>Estructuras de datos en Python</h4>
+                    <div class="click-hint">Girar ↻</div>
+                </div>
+                <div class="flip-card-back">
+                    <p>conocimiento de estructuras como listas, diccionarios, tuplas y conjuntos, que permiten almacenar y manipular información dentro de programas en Python.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 3 -->
+        <div class="flip-card" onclick="toggleFlip(this)">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600');">
+                    <h4>Manipulación básica de datos</h4>
+                    <div class="click-hint">Girar ↻</div>
+                </div>
+                <div class="flip-card-back">
+                    <p>capacidad para trabajar con conjuntos de datos simples, incluyendo lectura de archivos, manejo de registros y operaciones básicas de transformación de datos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 4 -->
+        <div class="flip-card" onclick="toggleFlip(this)">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&q=80&w=600');">
+                    <h4>Conceptos elementales de estadística descriptiva</h4>
+                    <div class="click-hint">Girar ↻</div>
+                </div>
+                <div class="flip-card-back">
+                    <p>comprensión de medidas básicas como media, mediana, moda, desviación estándar y distribución de datos, que permiten interpretar resultados durante el análisis exploratorio.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 5 -->
+        <div class="flip-card" onclick="toggleFlip(this)">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&q=80&w=600');">
+                    <h4>Uso básico de bibliotecas en Python</h4>
+                    <div class="click-hint">Girar ↻</div>
+                </div>
+                <div class="flip-card-back">
+                    <p>familiaridad con la instalación e importación de bibliotecas dentro de un entorno de programación, especialmente en entornos como Jupyter Notebook o Google Colab.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 6 -->
+        <div class="flip-card" onclick="toggleFlip(this)">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600');">
+                    <h4>Interpretación de información visual</h4>
+                    <div class="click-hint">Girar ↻</div>
+                </div>
+                <div class="flip-card-back">
+                    <p>capacidad para comprender gráficos básicos como gráficos de barras, histogramas o diagramas de dispersión, utilizados para representar información de forma visual.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 7 -->
+        <div class="flip-card" onclick="toggleFlip(this)">
+            <div class="flip-card-inner">
+                <div class="flip-card-front" style="background-image: url('https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&q=80&w=600');">
+                    <h4>Pensamiento analítico orientado a datos</h4>
+                    <div class="click-hint">Girar ↻</div>
+                </div>
+                <div class="flip-card-back">
+                    <p>disposición para explorar conjuntos de datos, identificar patrones, detectar inconsistencias y formular interpretaciones basadas en la evidencia obtenida durante el análisis.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function toggleFlip(card) {
+            card.classList.toggle('flipped');
+        }
+    </script>
+
+</body>
+
+</html>
