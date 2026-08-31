@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Matplotlib - Presentación Vertical</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f0f2f5;
+            color: #1a1a1a;
+            overflow-x: hidden;
+            text-align: left;
+        }
+
+        /* Instrucción flotante */
+        .floating-instruction {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #ffffff;
+            color: #1d4ed8;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #3b82f6;
+            z-index: 1000;
+            animation: fadeInDown 0.6s ease-out;
+            text-align: left;
+        }
+
+        /* Menú de navegación vertical lateral */
+        .vertical-nav {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 1000;
+        }
+        .nav-btn {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: #ffffff;
+            color: #4b5563;
+            border: 2px solid #e5e7eb;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        .nav-btn:hover, .nav-btn.active {
+            background: #3b82f6;
+            color: #ffffff;
+            border-color: #3b82f6;
+            transform: scale(1.1);
+        }
+
+        /* Contenedor de slides con scroll vertical y snap */
+        .slides-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 120px;
+            background: #ffffff;
+            position: relative;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .slide-content {
+            max-width: 900px;
+            width: 100%;
+            text-align: left;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        p {
+            font-size: 17px;
+            color: #374151;
+            margin-bottom: 16px;
+            text-align: left;
+            line-height: 1.6;
+        }
+        pre {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 18px 24px;
+            font-family: monospace;
+            font-size: 15px;
+            color: #1e293b;
+            margin-bottom: 16px;
+            text-align: left;
+            overflow-x: auto;
+            line-height: 1.4;
+        }
+        ul {
+            text-align: left;
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+        li {
+            font-size: 17px;
+            color: #374151;
+            margin-bottom: 8px;
+            text-align: left;
+            line-height: 1.5;
+        }
+        .keyword { color: #d97706; font-weight: 600; }
+        .string { color: #0284c7; }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Instrucción flotante -->
+    <div class="floating-instruction">
+        <i class="fa-solid fa-info-circle"></i> haga clic sobre los botones para ampliar la información
+    </div>
+
+    <!-- Botones de navegación vertical -->
+    <div class="vertical-nav" id="verticalNav">
+        <button class="nav-btn active" onclick="goToSlide(0)">1</button>
+        <button class="nav-btn" onclick="goToSlide(1)">2</button>
+        <button class="nav-btn" onclick="goToSlide(2)">3</button>
+        <button class="nav-btn" onclick="goToSlide(3)">4</button>
+        <button class="nav-btn" onclick="goToSlide(4)">5</button>
+        <button class="nav-btn" onclick="goToSlide(5)">6</button>
+        <button class="nav-btn" onclick="goToSlide(6)">7</button>
+        <button class="nav-btn" onclick="goToSlide(7)">8</button>
+    </div>
+
+    <div class="slides-container" id="slidesContainer">
+        
+        <!-- Slide 1: 3.2.1 -->
+        <div class="slide" id="slide-0">
+            <div class="slide-content">
+                <h2>3.2.1 Estructura básica de Matplotlib</h2>
+                <p>Matplotlib se basa principalmente en el módulo pyplot, que permite crear gráficos de manera sencilla.</p>
+                <pre><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+plt.plot([<span class="string">1, 2, 3, 4</span>])
+plt.title(<span class="string">"Gráfico básico"</span>)
+plt.show()</pre>
+                <p>Este código genera un gráfico de línea simple.</p>
+            </div>
+        </div>
+
+        <!-- Slide 2: 3.2.2 -->
+        <div class="slide" id="slide-1">
+            <div class="slide-content">
+                <h2>3.2.2 Gráfico de líneas</h2>
+                <p>El gráfico de líneas se utiliza para representar tendencias a lo largo del tiempo o secuencias ordenadas.</p>
+                <pre><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+x = [<span class="string">1, 2, 3, 4</span>]
+y = [<span class="string">10, 20, 30, 40</span>]
+
+plt.plot(x, y)
+plt.title(<span class="string">"Gráfico de líneas"</span>)
+plt.xlabel(<span class="string">"X"</span>)
+plt.ylabel(<span class="string">"Y"</span>)
+plt.show()</pre>
+                <p>Este tipo de gráfico es útil para visualizar cambios en una variable.</p>
+            </div>
+        </div>
+
+        <!-- Slide 3: 3.2.3 -->
+        <div class="slide" id="slide-2">
+            <div class="slide-content">
+                <h2>3.2.3 Gráfico de barras</h2>
+                <p>El gráfico de barras permite comparar valores entre categorías.</p>
+                <pre>categorias = [<span class="string">"A", "B", "C"</span>]
+valores = [<span class="string">10, 20, 15</span>]
+
+plt.bar(categorias, valores)
+plt.title(<span class="string">"Gráfico de barras"</span>)
+plt.show()</pre>
+                <p>Este gráfico es común en análisis categórico.</p>
+            </div>
+        </div>
+
+        <!-- Slide 4: 3.2.4 -->
+        <div class="slide" id="slide-3">
+            <div class="slide-content">
+                <h2>3.2.4 Histograma</h2>
+                <p>El histograma permite analizar la distribución de los datos.</p>
+                <pre><span class="keyword">import</span> numpy <span class="keyword">as</span> np
+
+data = np.random.randn(<span class="string">1000</span>)
+plt.hist(data)
+plt.title(<span class="string">"Histograma"</span>)
+plt.show()</pre>
+                <p>Este gráfico es útil para observar la forma de la distribución (Wilke, 2019)</p>
+            </div>
+        </div>
+
+        <!-- Slide 5: 3.2.5 -->
+        <div class="slide" id="slide-4">
+            <div class="slide-content">
+                <h2>3.2.5 Gráfico de dispersión (scatter plot)</h2>
+                <p>El gráfico de dispersión permite analizar la relación entre dos variables.</p>
+                <pre>x = [<span class="string">1, 2, 3, 4</span>]
+y = [<span class="string">10, 15, 25, 30</span>]
+
+plt.scatter(x, y)
+plt.title(<span class="string">"Gráfico de dispersión"</span>)
+plt.show()</pre>
+                <p>Este tipo de gráfico es fundamental en el análisis de correlaciones (James, Witten, Hastie & Tibshirani, 2021).</p>
+            </div>
+        </div>
+
+        <!-- Slide 6: 3.2.6 -->
+        <div class="slide" id="slide-5">
+            <div class="slide-content">
+                <h2>3.2.6 Personalización de gráficos</h2>
+                <p>Matplotlib permite personalizar los gráficos para mejorar su interpretación.</p>
+                <pre>plt.plot(x, y, color=<span class="string">"red"</span>, linestyle=<span class="string">"--"</span>)
+plt.title(<span class="string">"Gráfico personalizado"</span>)
+plt.xlabel(<span class="string">"Variable X"</span>)
+plt.ylabel(<span class="string">"Variable Y"</span>)
+plt.grid(<span class="keyword">True</span>)
+plt.show()</pre>
+                <p>La personalización es clave para una correcta comunicación de resultados (Knaflic, 2015).</p>
+            </div>
+        </div>
+
+        <!-- Slide 7: 3.2.7 -->
+        <div class="slide" id="slide-6">
+            <div class="slide-content">
+                <h2>3.2.7 Ejemplo integrado</h2>
+                <pre><span class="keyword">import</span> pandas <span class="keyword">as</span> pd
+<span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt
+
+data = {
+    <span class="string">"Edad"</span>: [<span class="string">20, 25, 30, 35, 40</span>]
+}
+
+df = pd.DataFrame(data)
+df[<span class="string">"Edad"</span>].plot(kind=<span class="string">"hist"</span>)
+plt.title(<span class="string">"Distribución de edades"</span>)
+plt.show()</pre>
+                <p>Este ejemplo muestra cómo integrar Pandas con Matplotlib.</p>
+            </div>
+        </div>
+
+        <!-- Slide 8: 3.2.8 -->
+        <div class="slide" id="slide-7">
+            <div class="slide-content">
+                <h2>3.2.8 Importancia en el análisis de datos</h2>
+                <p>El uso de Matplotlib permite:</p>
+                <ul>
+                    <li>Representar datos de forma visual.</li>
+                    <li>Identificar patrones y tendencias.</li>
+                    <li>Mejorar la interpretación de resultados.</li>
+                    <li>Facilitar la comunicación de hallazgos.</li>
+                </ul>
+                <p>Según Wilke (2019), la visualización efectiva es clave para transformar datos en conocimiento.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function goToSlide(index) {
+            const target = document.getElementById('slide-' + index);
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Sincronizar el botón activo según la posición del scroll vertical
+        const container = document.getElementById('slidesContainer');
+        const buttons = document.querySelectorAll('.nav-btn');
+
+        container.addEventListener('scroll', () => {
+            let index = Math.round(container.scrollTop / window.innerHeight);
+            buttons.forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
