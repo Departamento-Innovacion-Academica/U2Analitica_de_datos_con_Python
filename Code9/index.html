@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Efecto Typing Python - Dos Ventanas</title>
+  <style>
+    /* Estilos generales */
+    body {
+      background-color: #121214;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+      font-family: 'Fira Code', 'Cascadia Code', Consolas, Monaco, monospace;
+    }
+
+    /* Contenedor Grid para dos columnas */
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      width: 100%;
+      max-width: 1100px;
+    }
+
+    /* Ventana tipo terminal */
+    .code-window {
+      background-color: #1e1e24;
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      width: 100%;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Barra superior de la ventana */
+    .window-header {
+      background-color: #18181c;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-circle {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .close { background-color: #ff5f56; }
+    .minimize { background-color: #ffbd2e; }
+    .maximize { background-color: #27c93f; }
+
+    .window-title {
+      color: #7a7a8c;
+      font-size: 13px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* Área donde se escribe el código */
+    .code-body {
+      padding: 24px;
+      color: #ffffff;
+      font-size: 14px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      text-align: left;
+      flex-grow: 1;
+    }
+
+    /* Colores del Syntax Highlighting */
+    .blue-val { color: #2e7cd6; }                       /* Métodos y cadenas */
+    .red-var  { color: #ff5555; }                       /* Variables df */
+
+    /* Cursor parpadeante fino (estilo editor) */
+    .cursor {
+      display: inline-block;
+      width: 2px;
+      height: 16px;
+      background-color: #ffffff;
+      margin-left: 2px;
+      vertical-align: middle;
+      animation: blink 0.8s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grid-container">
+    
+    <!-- Ventana 1: Boxplot -->
+    <div class="code-window">
+      <div class="window-header">
+        <span class="btn-circle close"></span>
+        <span class="btn-circle minimize"></span>
+        <span class="btn-circle maximize"></span>
+        <span class="window-title">boxplot.py</span>
+      </div>
+      <div class="code-body"><span id="code-content-1"></span><span class="cursor"></span></div>
+    </div>
+
+    <!-- Ventana 2: Scatter Plot -->
+    <div class="code-window">
+      <div class="window-header">
+        <span class="btn-circle close"></span>
+        <span class="btn-circle minimize"></span>
+        <span class="btn-circle maximize"></span>
+        <span class="window-title">scatterplot.py</span>
+      </div>
+      <div class="code-body"><span id="code-content-2"></span><span class="cursor"></span></div>
+    </div>
+
+  </div>
+
+  <script>
+    // Función genérica para animar código por tokens
+    function createTypingEffect(targetId, tokens, speed = 35) {
+      const container = document.getElementById(targetId);
+      let tokenIndex = 0;
+      let charIndex = 0;
+      let currentElement = null;
+
+      function typeCode() {
+        if (tokenIndex < tokens.length) {
+          const currentToken = tokens[tokenIndex];
+
+          if (charIndex === 0) {
+            if (currentToken.class) {
+              currentElement = document.createElement("span");
+              currentElement.className = currentToken.class;
+              container.appendChild(currentElement);
+            } else {
+              currentElement = document.createTextNode("");
+              container.appendChild(currentElement);
+            }
+          }
+
+          const char = currentToken.text.charAt(charIndex);
+          if (currentToken.class) {
+            currentElement.textContent += char;
+          } else {
+            currentElement.nodeValue += char;
+          }
+
+          charIndex++;
+
+          if (charIndex === currentToken.text.length) {
+            charIndex = 0;
+            tokenIndex++;
+          }
+
+          setTimeout(typeCode, speed);
+        }
+      }
+
+      setTimeout(typeCode, 500);
+    }
+
+    // Tokens para la ventana 1 (Boxplot)
+    const tokensBoxplot = [
+      { text: "import seaborn as sns\n\nsns." },
+      { text: "boxplot", class: "blue-val" },
+      { text: '(x=df["Edad"])\nplt.' },
+      { text: "show", class: "blue-val" },
+      { text: "()" }
+    ];
+
+    // Tokens para la ventana 2 (Scatter Plot)
+    const tokensScatter = [
+      { text: "plt." },
+      { text: "scatter", class: "blue-val" },
+      { text: "(" },
+      { text: "df", class: "red-var" },
+      { text: '["Edad"], ' },
+      { text: "df", class: "red-var" },
+      { text: '["Ingresos"])\nplt.' },
+      { text: "show", class: "blue-val" },
+      { text: "()" }
+    ];
+
+    // Inicializar ambas animaciones de forma independiente
+    createTypingEffect("code-content-1", tokensBoxplot, 35);
+    createTypingEffect("code-content-2", tokensScatter, 35);
+  </script>
+
+</body>
+</html>
