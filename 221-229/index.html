@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exploración Inicial de Datos - Tech Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #090614;
+            background-image: 
+                radial-gradient(circle at 80% 20%, rgba(138, 43, 226, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 20% 80%, rgba(72, 60, 154, 0.22) 0%, transparent 45%);
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: left;
+            overflow-x: hidden;
+        }
+
+        @keyframes containerEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .carousel-container {
+            width: 100%;
+            max-width: 820px;
+            background: rgba(18, 14, 32, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 
+                        0 0 0 1px rgba(255, 255, 255, 0.08),
+                        0 0 40px rgba(138, 43, 226, 0.18);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(138, 43, 226, 0.35);
+            animation: containerEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .carousel-header {
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(12, 9, 24, 0.8);
+        }
+
+        .carousel-instructions {
+            font-size: 13px;
+            color: #a5b4fc;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(168, 85, 247, 0.12);
+            padding: 6px 14px;
+            border-radius: 20px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.15);
+            animation: floatInstruction 3s ease-in-out infinite;
+        }
+
+        @keyframes floatInstruction {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .carousel-instructions::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #a855f7;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #a855f7;
+        }
+
+        .carousel-track-container {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            list-style: none;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            padding: 35px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            max-height: 72vh;
+            overflow-y: auto;
+        }
+
+        .carousel-slide::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .carousel-slide::-webkit-scrollbar-thumb {
+            background: rgba(168, 85, 247, 0.4);
+            border-radius: 3px;
+        }
+
+        .carousel-slide.active-slide {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .carousel-slide.active-slide .slide-title {
+            animation: slideElementUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+            opacity: 0;
+        }
+
+        .carousel-slide.active-slide .slide-content-block {
+            animation: slideElementUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideElementUp {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 14px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #d8b4fe 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-text {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .slide-list {
+            margin-bottom: 12px;
+            padding-left: 20px;
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        .slide-list li {
+            margin-bottom: 6px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .code-box-wrapper {
+            background: rgba(4, 3, 10, 0.85);
+            border: 1px solid rgba(168, 85, 247, 0.4);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .code-header-bar {
+            background: rgba(20, 15, 38, 0.95);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .code-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #f59e0b; }
+        .dot-green { background: #10b981; }
+
+        .code-lang {
+            margin-left: 15px;
+            font-size: 11px;
+            color: #d8b4fe;
+            font-family: 'Fira Code', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .code-box {
+            padding: 14px 18px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: #e2e8f0;
+            overflow-x: auto;
+            line-height: 1.5;
+            text-align: left;
+            min-height: 60px;
+            white-space: pre;
+            word-wrap: normal;
+        }
+
+        .code-keyword { color: #f472b6; font-weight: 500; }
+        .code-string { color: #34d399; }
+        .code-number { color: #fbbf24; }
+        .code-func { color: #60a5fa; }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 13px;
+            background-color: #c084fc;
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 35px;
+            background: rgba(12, 9, 24, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            order: 1;
+        }
+
+        .indicators {
+            display: flex;
+            gap: 8px;
+            order: 2;
+        }
+
+        .indicator {
+            width: 20px;
+            height: 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .indicator.active {
+            width: 32px;
+            background: #a855f7;
+            box-shadow: 0 0 12px rgba(168, 85, 247, 0.8);
+        }
+
+        .carousel-btn {
+            background: rgba(25, 18, 48, 0.8);
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            color: #d8b4fe;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-btn:hover:not(:disabled) {
+            background: #a855f7;
+            color: #ffffff;
+            border-color: #d8b4fe;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(168, 85, 247, 0.5);
+        }
+
+        .carousel-btn:disabled {
+            background: rgba(18, 14, 32, 0.5);
+            border-color: rgba(255, 255, 255, 0.05);
+            color: #475569;
+            cursor: not-allowed;
+            opacity: 0.5;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .slide-counter {
+            font-size: 13px;
+            font-weight: 600;
+            color: #d8b4fe;
+            font-family: 'Fira Code', monospace;
+            background: rgba(168, 85, 247, 0.15);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            order: 3;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="carousel-container">
+        <div class="carousel-header">
+            <span class="carousel-instructions">Haga clic sobre las flechas para navegar</span>
+            <span class="slide-counter" id="slideCounter">01 / 09</span>
+        </div>
+
+        <div class="carousel-track-container">
+            <ul class="carousel-track" id="carouselTrack">
+                <!-- Slide 1: 2.2.1 Carga y visualización inicial de datos -->
+                <li class="carousel-slide active-slide" data-index="0">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.1 Carga y visualización inicial de datos</h2>
+                        <p class="slide-text">El primer paso consiste en cargar el conjunto de datos y visualizar sus primeras filas.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-0"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">El método head() permite visualizar las primeras filas del dataset, lo cual ayuda a entender su estructura.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 2: 2.2.2 Dimensiones del conjunto de datos -->
+                <li class="carousel-slide" data-index="1">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.2 Dimensiones del conjunto de datos</h2>
+                        <p class="slide-text">Es importante conocer el tamaño del dataset, es decir, cuántas filas y columnas contiene.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-1"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Este resultado permite identificar la cantidad de observaciones y variables disponibles.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 3: 2.2.3 Información general del dataset -->
+                <li class="carousel-slide" data-index="2">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.3 Información general del dataset</h2>
+                        <p class="slide-text">El método info() proporciona un resumen estructural del conjunto de datos.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-2"></div>
+                        </div>
+                        <p class="slide-text">Este método permite identificar:</p>
+                        <ul class="slide-list">
+                            <li>Tipos de datos.</li>
+                            <li>Valores no nulos.</li>
+                            <li>Número de columnas.</li>
+                        </ul>
+                        <p class="slide-text" style="margin-bottom: 0;">Según McKinney (2022), esta función es esencial para evaluar rápidamente la calidad de los datos.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 4: 2.2.4 Identificación de nombres de columnas -->
+                <li class="carousel-slide" data-index="3">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.4 Identificación de nombres de columnas</h2>
+                        <p class="slide-text">Conocer las variables disponibles es clave para el análisis.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-3"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Esto permite entender qué información contiene el dataset.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 5: 2.2.5 Revisión de tipos de datos -->
+                <li class="carousel-slide" data-index="4">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.5 Revisión de tipos de datos</h2>
+                        <p class="slide-text">Los tipos de datos influyen directamente en las operaciones que se pueden realizar.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-4"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Una mala asignación de tipos puede generar errores en el análisis, por lo que esta revisión es fundamental (James, Witten, Hastie & Tibshirani, 2021).</p>
+                    </div>
+                </li>
+
+                <!-- Slide 6: 2.2.6 Visualización de muestras aleatorias -->
+                <li class="carousel-slide" data-index="5">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.6 Visualización de muestras aleatorias</h2>
+                        <p class="slide-text">Además de head(), es útil observar registros aleatorios.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-5"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Esto permite detectar patrones o inconsistencias que no siempre aparecen en las primeras filas.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 7: 2.2.7 Estadísticas descriptivas iniciales -->
+                <li class="carousel-slide" data-index="6">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.7 Estadísticas descriptivas iniciales</h2>
+                        <p class="slide-text">Una primera aproximación al comportamiento de los datos se obtiene mediante estadísticas básicas.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-6"></div>
+                        </div>
+                        <p class="slide-text">Esto permite identificar:</p>
+                        <ul class="slide-list">
+                            <li>Promedios.</li>
+                            <li>Valores extremos.</li>
+                            <li>Dispersión.</li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Slide 8: 2.2.8 Conteo de valores categóricos -->
+                <li class="carousel-slide" data-index="7">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.8 Conteo de valores categóricos</h2>
+                        <p class="slide-text">Para variables categóricas, es útil analizar la frecuencia de valores.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-7"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Este análisis permite identificar categorías dominantes o poco frecuentes.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 9: 2.2.9 Ejemplo integrado de exploración inicial -->
+                <li class="carousel-slide" data-index="8">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">2.2.9 Ejemplo integrado de exploración inicial</h2>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-8"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Este flujo representa una exploración inicial estándar en análisis de datos.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="carousel-nav">
+            <div class="nav-buttons">
+                <button class="carousel-btn" id="prevBtn" disabled aria-label="Anterior">&#10094;</button>
+                <button class="carousel-btn" id="nextBtn" aria-label="Siguiente">&#10095;</button>
+            </div>
+            <div class="indicators" id="indicators">
+                <span class="indicator active" data-target="0"></span>
+                <span class="indicator" data-target="1"></span>
+                <span class="indicator" data-target="2"></span>
+                <span class="indicator" data-target="3"></span>
+                <span class="indicator" data-target="4"></span>
+                <span class="indicator" data-target="5"></span>
+                <span class="indicator" data-target="6"></span>
+                <span class="indicator" data-target="7"></span>
+                <span class="indicator" data-target="8"></span>
+            </div>
+            <span class="slide-counter" id="slideCounter">01 / 09</span>
+        </div>
+    </div>
+
+    <script>
+        const codeContents = [
+            /* Slide 1 Code */
+            `<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd\n\ndf = pd.<span class="code-func">read_csv</span>(<span class="code-string">"datos.csv"</span>)\n<span class="code-func">print</span>(df.<span class="code-func">head</span>())`,
+            /* Slide 2 Code */
+            `<span class="code-func">print</span>(df.<span class="code-func">shape</span>)`,
+            /* Slide 3 Code */
+            `<span class="code-func">print</span>(df.<span class="code-func">info</span>())`,
+            /* Slide 4 Code */
+            `<span class="code-func">print</span>(df.<span class="code-func">columns</span>)`,
+            /* Slide 5 Code */
+            `<span class="code-func">print</span>(df.<span class="code-func">dtypes</span>)`,
+            /* Slide 6 Code */
+            `<span class="code-func">print</span>(df.<span class="code-func">sample</span>(<span class="code-number">5</span>))`,
+            /* Slide 7 Code */
+            `<span class="code-func">print</span>(df.<span class="code-func">describe</span>())`,
+            /* Slide 8 Code */
+            `<span class="code-func">print</span>(df[<span class="code-string">"Ciudad"</span>].<span class="code-func">value_counts</span>())`,
+            /* Slide 9 Code */
+            `<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd\n\ndf = pd.<span class="code-func">read_csv</span>(<span class="code-string">"datos.csv"</span>)\n\n<span class="code-keyword"># Visualización</span>\n<span class="code-func">print</span>(df.<span class="code-func">head</span>())\n\n<span class="code-keyword"># Dimensiones</span>\n<span class="code-func">print</span>(<span class="code-string">"Dimensiones:"</span>, df.<span class="code-func">shape</span>)\n\n<span class="code-keyword"># Información</span>\n<span class="code-func">print</span>(df.<span class="code-func">info</span>())\n\n<span class="code-keyword"># Tipos de datos</span>\n<span class="code-func">print</span>(df.<span class="code-func">dtypes</span>)\n\n<span class="code-keyword"># Estadísticas</span>\n<span class="code-func">print</span>(df.<span class="code-func">describe</span>())`
+        ];
+
+        const track = document.getElementById('carouselTrack');
+        const slides = Array.from(track.children);
+        const nextButton = document.getElementById('nextBtn');
+        const prevButton = document.getElementById('prevBtn');
+        const indicatorsContainer = document.getElementById('indicators');
+        const indicators = Array.from(indicatorsContainer.children);
+        const slideCounter = document.getElementById('slideCounter');
+
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        let typingTimeout = null;
+
+        function typeCode(elementId, htmlString, speed = 10) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            
+            if (typingTimeout) {
+                clearTimeout(typingTimeout);
+            }
+
+            container.innerHTML = '';
+            
+            let i = 0;
+            let isInsideTag = false;
+            let currentBuiltHtml = '';
+
+            function typeWriter() {
+                if (i < htmlString.length) {
+                    let char = htmlString.charAt(i);
+                    
+                    if (char === '<') {
+                        isInsideTag = true;
+                    }
+                    
+                    currentBuiltHtml += char;
+                    
+                    if (char === '>') {
+                        isInsideTag = false;
+                    }
+
+                    container.innerHTML = currentBuiltHtml + '<span class="typing-cursor"></span>';
+                    
+                    i++;
+                    
+                    let currentSpeed = isInsideTag ? 2 : speed;
+                    if (char === '\n') currentSpeed = speed * 2;
+
+                    typingTimeout = setTimeout(typeWriter, currentSpeed);
+                } else {
+                    container.innerHTML = currentBuiltHtml + '<span class="typing-cursor"></span>';
+                }
+            }
+
+            typeWriter();
+        }
+
+        function updateCarousel(index) {
+            track.style.transform = `translateX(-${index * 100}%)`;
+            
+            slides.forEach((slide, idx) => {
+                if(idx === index) {
+                    slide.classList.add('active-slide');
+                } else {
+                    slide.classList.remove('active-slide');
+                }
+            });
+
+            indicators.forEach((ind, idx) => {
+                if(idx === index) {
+                    ind.classList.add('active');
+                } else {
+                    ind.classList.remove('active');
+                }
+            });
+
+            slideCounter.textContent = `0${index + 1} / 0${totalSlides}`.replace(/0(\d{2})/, '$1');
+
+            if (index === 0) {
+                prevButton.disabled = true;
+            } else {
+                prevButton.disabled = false;
+            }
+
+            if (index === totalSlides - 1) {
+                nextButton.disabled = true;
+            } else {
+                nextButton.disabled = false;
+            }
+
+            setTimeout(() => {
+                typeCode(`code-${index}`, codeContents[index], 10);
+            }, 250);
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < totalSlides - 1) {
+                currentIndex++;
+                updateCarousel(currentIndex);
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCarousel(currentIndex);
+            }
+        });
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                if (currentIndex !== index) {
+                    currentIndex = index;
+                    updateCarousel(currentIndex);
+                }
+            });
+        });
+
+        updateCarousel(0);
+    </script>
+</body>
+</html>
