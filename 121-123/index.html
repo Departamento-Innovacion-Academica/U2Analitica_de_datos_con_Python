@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medidas de Tendencia Central - Tech Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #040914;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(72, 60, 154, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(72, 60, 154, 0.1) 0%, transparent 40%);
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: left;
+            overflow-x: hidden;
+        }
+
+        @keyframes containerEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .carousel-container {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(11, 18, 33, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 
+                        0 0 0 1px rgba(255, 255, 255, 0.06),
+                        0 0 35px rgba(72, 96, 154, 0.15);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(72, 96, 154, 0.3);
+            animation: containerEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .carousel-header {
+            padding: 24px 35px 16px 35px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .carousel-instructions {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .carousel-instructions::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #483C9A;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #483C9A;
+        }
+
+        .carousel-track-container {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            list-style: none;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            padding: 35px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .carousel-slide.active-slide {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .carousel-slide.active-slide .slide-title {
+            animation: slideElementUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+            opacity: 0;
+        }
+
+        .carousel-slide.active-slide .slide-text-top {
+            animation: slideElementUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+            opacity: 0;
+        }
+
+        .carousel-slide.active-slide .code-box-wrapper {
+            animation: slideElementUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards;
+            opacity: 0;
+        }
+
+        .carousel-slide.active-slide .slide-text-bottom {
+            animation: slideElementUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideElementUp {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-title {
+            font-size: 26px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 14px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #7d6ee0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-text {
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: #cbd5e1;
+            margin-bottom: 18px;
+        }
+
+        .code-box-wrapper {
+            background: rgba(2, 6, 23, 0.7);
+            border: 1px solid rgba(72, 60, 154, 0.4);
+            border-radius: 14px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .code-header-bar {
+            background: rgba(15, 23, 42, 0.9);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .code-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #f59e0b; }
+        .dot-green { background: #10b981; }
+
+        .code-lang {
+            margin-left: 15px;
+            font-size: 11px;
+            color: #64748b;
+            font-family: 'Fira Code', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .code-box {
+            padding: 18px 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            color: #e2e8f0;
+            overflow-x: auto;
+            line-height: 1.6;
+            text-align: left;
+            min-height: 90px;
+            white-space: pre;
+        }
+
+        .code-keyword { color: #c678dd; font-weight: 500; }
+        .code-string { color: #98c379; }
+        .code-number { color: #d19a66; }
+        .code-func { color: #61afef; }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background-color: #7d6ee0;
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 35px;
+            background: rgba(11, 18, 33, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .indicators {
+            display: flex;
+            gap: 10px;
+        }
+
+        .indicator {
+            width: 24px;
+            height: 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .indicator.active {
+            width: 36px;
+            background: #483C9A;
+            box-shadow: 0 0 12px rgba(72, 60, 154, 0.8);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 14px;
+        }
+
+        .carousel-btn {
+            background: rgba(20, 27, 45, 0.8);
+            border: 1px solid rgba(72, 60, 154, 0.5);
+            color: #9d91ff;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-btn:hover:not(:disabled) {
+            background: #483C9A;
+            color: #ffffff;
+            border-color: #483C9A;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(72, 60, 154, 0.5);
+        }
+
+        .carousel-btn:disabled {
+            background: rgba(11, 18, 33, 0.5);
+            border-color: rgba(255, 255, 255, 0.05);
+            color: #475569;
+            cursor: not-allowed;
+            opacity: 0.5;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .slide-counter {
+            font-size: 13px;
+            font-weight: 600;
+            color: #9d91ff;
+            font-family: 'Fira Code', monospace;
+            background: rgba(72, 60, 154, 0.15);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(72, 60, 154, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="carousel-container">
+        <div class="carousel-header">
+            <span class="carousel-instructions">Haga clic sobre las flechas para navegar</span>
+            <span class="slide-counter" id="slideCounter">01 / 03</span>
+        </div>
+
+        <div class="carousel-track-container">
+            <ul class="carousel-track" id="carouselTrack">
+                <!-- Slide 1: 1.2.1 Media (promedio) -->
+                <li class="carousel-slide active-slide" data-index="0">
+                    <div>
+                        <h2 class="slide-title">1.2.1 Media (promedio)</h2>
+                        <p class="slide-text slide-text-top">La media aritmética es la medida más utilizada y se calcula como la suma de todos los valores dividida entre el número de observaciones.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-0"></div>
+                        </div>
+                    </div>
+                    <p class="slide-text slide-text-bottom" style="margin-bottom: 0;">La media es útil cuando los datos están distribuidos de manera uniforme, aunque puede verse afectada por valores extremos.</p>
+                </li>
+
+                <!-- Slide 2: 1.2.2 Mediana -->
+                <li class="carousel-slide" data-index="1">
+                    <div>
+                        <h2 class="slide-title">1.2.2 Mediana</h2>
+                        <p class="slide-text slide-text-top">La mediana corresponde al valor central de un conjunto de datos ordenado. Es especialmente útil cuando existen valores atípicos, ya que no se ve afectada por ellos.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-1"></div>
+                        </div>
+                    </div>
+                    <p class="slide-text slide-text-bottom" style="margin-bottom: 0;">La mediana proporciona una representación más robusta en distribuciones sesgadas.</p>
+                </li>
+
+                <!-- Slide 3: 1.2.3 Moda -->
+                <li class="carousel-slide" data-index="2">
+                    <div>
+                        <h2 class="slide-title">1.2.3 Moda</h2>
+                        <p class="slide-text slide-text-top">La moda es el valor que más se repite dentro de un conjunto de datos.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-2"></div>
+                        </div>
+                    </div>
+                    <p class="slide-text slide-text-bottom" style="margin-bottom: 0;">La moda es especialmente útil en variables categóricas.</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="carousel-nav">
+            <div class="indicators" id="indicators">
+                <span class="indicator active" data-target="0"></span>
+                <span class="indicator" data-target="1"></span>
+                <span class="indicator" data-target="2"></span>
+            </div>
+            <div class="nav-buttons">
+                <button class="carousel-btn" id="prevBtn" disabled aria-label="Anterior">&#10094;</button>
+                <button class="carousel-btn" id="nextBtn" aria-label="Siguiente">&#10095;</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const codeContents = [
+            `<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd\n\ndata = {\n    <span class="code-string">"Edad"</span>: [<span class="code-number">23</span>, <span class="code-number">30</span>, <span class="code-number">35</span>, <span class="code-number">40</span>, <span class="code-number">28</span>]\n}\n\ndf = pd.DataFrame(data)\n<span class="code-func">print</span>(<span class="code-string">"Media:"</span>, df[<span class="code-string">"Edad"</span>].<span class="code-func">mean</span>())`,
+            
+            `<span class="code-func">print</span>(<span class="code-string">"Mediana:"</span>, df[<span class="code-string">"Edad"</span>].<span class="code-func">median</span>())`,
+            
+            `data = {\n    <span class="code-string">"Ciudad"</span>: [<span class="code-string">"Bogotá"</span>, <span class="code-string">"Cali"</span>, <span class="code-string">"Bogotá"</span>, <span class="code-string">"Medellín"</span>]\n}\n\ndf = pd.DataFrame(data)\n<span class="code-func">print</span>(<span class="code-string">"Moda:"</span>, df[<span class="code-string">"Ciudad"</span>].<span class="code-func">mode</span>())`
+        ];
+
+        const track = document.getElementById('carouselTrack');
+        const slides = Array.from(track.children);
+        const nextButton = document.getElementById('nextBtn');
+        const prevButton = document.getElementById('prevBtn');
+        const indicatorsContainer = document.getElementById('indicators');
+        const indicators = Array.from(indicatorsContainer.children);
+        const slideCounter = document.getElementById('slideCounter');
+
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        let typingTimeouts = {};
+
+        function typeCode(elementId, htmlString, speed = 12) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            
+            if (typingTimeouts[elementId]) {
+                clearTimeout(typingTimeouts[elementId]);
+            }
+
+            container.innerHTML = '';
+            
+            let i = 0;
+            let isInsideTag = false;
+            let currentBuiltHtml = '';
+
+            function typeWriter() {
+                if (i < htmlString.length) {
+                    let char = htmlString.charAt(i);
+                    
+                    if (char === '<') {
+                        isInsideTag = true;
+                    }
+                    
+                    currentBuiltHtml += char;
+                    
+                    if (char === '>') {
+                        isInsideTag = false;
+                    }
+
+                    container.innerHTML = currentBuiltHtml + '<span class="typing-cursor"></span>';
+                    
+                    i++;
+                    
+                    let currentSpeed = isInsideTag ? 2 : speed;
+                    if (char === '\n') currentSpeed = speed * 2;
+
+                    typingTimeouts[elementId] = setTimeout(typeWriter, currentSpeed);
+                } else {
+                    container.innerHTML = currentBuiltHtml + '<span class="typing-cursor"></span>';
+                }
+            }
+
+            typeWriter();
+        }
+
+        function updateCarousel(index) {
+            track.style.transform = `translateX(-${index * 100}%)`;
+            
+            slides.forEach((slide, idx) => {
+                if(idx === index) {
+                    slide.classList.add('active-slide');
+                } else {
+                    slide.classList.remove('active-slide');
+                }
+            });
+
+            indicators.forEach((ind, idx) => {
+                if(idx === index) {
+                    ind.classList.add('active');
+                } else {
+                    ind.classList.remove('active-slide');
+                    ind.classList.remove('active');
+                }
+            });
+            
+            // Re-apply active class safely to indicators
+            indicators.forEach((ind, idx) => {
+                if(idx === index) {
+                    ind.classList.add('active');
+                } else {
+                    ind.classList.remove('active');
+                }
+            });
+
+            slideCounter.textContent = `0${index + 1} / 0${totalSlides}`;
+
+            if (index === 0) {
+                prevButton.disabled = true;
+            } else {
+                prevButton.disabled = false;
+            }
+
+            if (index === totalSlides - 1) {
+                nextButton.disabled = true;
+            } else {
+                nextButton.disabled = false;
+            }
+
+            setTimeout(() => {
+                typeCode(`code-${index}`, codeContents[index], 15);
+            }, 250);
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < totalSlides - 1) {
+                currentIndex++;
+                updateCarousel(currentIndex);
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCarousel(currentIndex);
+            }
+        });
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                if (currentIndex !== index) {
+                    currentIndex = index;
+                    updateCarousel(currentIndex);
+                }
+            });
+        });
+
+        updateCarousel(0);
+    </script>
+</body>
+</html>
