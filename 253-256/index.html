@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Variables - Tema Claro Espectacular</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
+            --text-secondary: #475569;
+            --accent-1: #6366f1;
+            --accent-2: #ec4899;
+            --accent-3: #14b8a6;
+            --code-bg: #1e1e2e;
+            --code-text: #cdd6f4;
+            --border-light: rgba(255, 255, 255, 0.8);
+            --shadow-soft: 0 20px 40px rgba(148, 163, 184, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 50px 20px;
+            position: relative;
+            overflow-x: hidden;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        body::before {
+            width: 400px;
+            height: 400px;
+            background: var(--accent-1);
+            top: -100px;
+            left: -100px;
+        }
+
+        body::after {
+            width: 500px;
+            height: 500px;
+            background: var(--accent-2);
+            bottom: -150px;
+            right: -100px;
+            opacity: 0.2;
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .header-container h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(to right, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .click-instruction {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--accent-1);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- Ajuste de Altura y Scroll de Tarjetas --- */
+        .module-card {
+            background-color: transparent;
+            height: 520px;
+            /* Incrementado para dar más margen vertical */
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-flipper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            -webkit-transform-style: preserve-3d;
+        }
+
+        .module-card.flipped .card-flipper {
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-soft);
+            backface-visibility: hidden !important;
+            -webkit-backface-visibility: hidden !important;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+        }
+
+        /* Cara Frontal */
+        .card-front {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            z-index: 2;
+            transform: rotateY(0deg);
+            -webkit-transform: rotateY(0deg);
+        }
+
+        .card-front::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-3));
+        }
+
+        .icon-wrapper {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-1);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .card-front h2 {
+            font-size: 1.4rem;
+            color: var(--text-main);
+            line-height: 1.4;
+            font-weight: 600;
+        }
+
+        .flip-hint {
+            margin-top: 30px;
+            font-size: 0.85rem;
+            color: var(--accent-2);
+            font-weight: 500;
+            background: rgba(236, 72, 153, 0.1);
+            padding: 8px 20px;
+            border-radius: 20px;
+        }
+
+        /* Cara Trasera con Scroll Interno */
+        .card-back {
+            transform: rotateY(180deg);
+            -webkit-transform: rotateY(180deg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            /* Habilita scroll si el contenido sobrepasa la tarjeta */
+            z-index: 1;
+        }
+
+        .card-back::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-back::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.3);
+            border-radius: 10px;
+        }
+
+        .card-back h3 {
+            font-size: 1.2rem;
+            color: var(--accent-1);
+            margin-bottom: 12px;
+            font-weight: 700;
+            border-bottom: 2px dashed rgba(99, 102, 241, 0.2);
+            padding-bottom: 8px;
+        }
+
+        .card-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        /* Bloque de Código Ajustado */
+        .code-window {
+            background-color: var(--code-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            max-height: 280px;
+            /* Evita que la ventana de código desborde el contenedor */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .code-header {
+            background: #11111b;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+
+        .mac-btn {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .close {
+            background: #ff5f56;
+        }
+
+        .min {
+            background: #ffbd2e;
+        }
+
+        .max {
+            background: #27c93f;
+        }
+
+        .code-content {
+            padding: 12px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: var(--code-text);
+            white-space: pre-wrap;
+            word-break: normal;
+            overflow-wrap: break-word;
+            line-height: 1.4;
+            overflow-y: auto;
+        }
+
+        .kw {
+            color: #cba6f7;
+            font-weight: 500;
+        }
+
+        .str {
+            color: #a6e3a1;
+        }
+
+        .fn {
+            color: #89b4fa;
+        }
+
+        .num {
+            color: #fab387;
+        }
+
+        .comment {
+            color: #6c7086;
+            font-style: italic;
+        }
+
+        .institutional-credits {
+            margin-top: 80px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .institutional-credits h4 {
+            color: #0f172a;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .institutional-credits p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .module-card {
+                height: 550px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header-container">
+        <h1>Análisis y Visualización de Datos</h1>
+        <div class="click-instruction">
+            <span>👆</span> Haga clic en las tarjetas para descubrir el contenido
+        </div>
+    </div>
+
+    <div class="grid-layout">
+
+        <!-- Tarjeta 1 -->
+        <div class="module-card" onclick="this.classList.toggle('flipped')">
+            <div class="card-flipper">
+                <div class="card-face card-front">
+                    <div class="icon-wrapper">2.5.3</div>
+                    <h2>Visualización de relaciones (scatter plot)</h2>
+                    <div class="flip-hint">Dar clic para girar</div>
+                </div>
+                <div class="card-face card-back">
+                    <h3>2.5.3 Visualización de relaciones (scatter plot)</h3>
+                    <p class="card-text">El gráfico de dispersión permite visualizar la relación entre dos variables.
+                    </p>
+                    <p class="card-text">Ejemplo:</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="mac-btn close"></span>
+                            <span class="mac-btn min"></span>
+                            <span class="mac-btn max"></span>
+                        </div>
+                        <div class="code-content"><span class="kw">import</span> matplotlib.pyplot <span
+                                class="kw">as</span> plt
+
+                            plt.<span class="fn">scatter</span>(df[<span class="str">"Edad"</span>], df[<span
+                                class="str">"Ingresos"</span>])
+                            plt.<span class="fn">xlabel</span>(<span class="str">"Edad"</span>)
+                            plt.<span class="fn">ylabel</span>(<span class="str">"Ingresos"</span>)
+                            plt.<span class="fn">title</span>(<span class="str">"Relación entre Edad e Ingresos"</span>)
+                            plt.<span class="fn">show</span>()</div>
+                    </div>
+                    <p class="card-text">Este tipo de gráfico permite identificar patrones visuales.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 2 -->
+        <div class="module-card" onclick="this.classList.toggle('flipped')">
+            <div class="card-flipper">
+                <div class="card-face card-front">
+                    <div class="icon-wrapper">2.5.4</div>
+                    <h2>Relación entre variables categóricas y numéricas</h2>
+                    <div class="flip-hint">Dar clic para girar</div>
+                </div>
+                <div class="card-face card-back">
+                    <h3>2.5.4 Relación entre variables categóricas y numéricas</h3>
+                    <p class="card-text">Cuando se combinan variables categóricas y numéricas, es posible analizar
+                        diferencias entre grupos.</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="mac-btn close"></span>
+                            <span class="mac-btn min"></span>
+                            <span class="mac-btn max"></span>
+                        </div>
+                        <div class="code-content">data = {
+                            <span class="str">"Ciudad"</span>: [<span class="str">"Bogotá"</span>, <span
+                                class="str">"Bogotá"</span>, <span class="str">"Cali"</span>, <span
+                                class="str">"Cali"</span>],
+                            <span class="str">"Ventas"</span>: [<span class="num">100</span>, <span
+                                class="num">150</span>, <span class="num">200</span>, <span class="num">250</span>]
+                            }
+
+                            df = pd.<span class="fn">DataFrame</span>(data)
+                            <span class="fn">print</span>(df.<span class="fn">groupby</span>(<span
+                                class="str">"Ciudad"</span>)[<span class="str">"Ventas"</span>].<span
+                                class="fn">mean</span>())
+                        </div>
+                    </div>
+                    <p class="card-text">Este análisis permite comparar comportamientos entre categorías.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 3 -->
+        <div class="module-card" onclick="this.classList.toggle('flipped')">
+            <div class="card-flipper">
+                <div class="card-face card-front">
+                    <div class="icon-wrapper">2.5.5</div>
+                    <h2>Análisis multivariable</h2>
+                    <div class="flip-hint">Dar clic para girar</div>
+                </div>
+                <div class="card-face card-back">
+                    <h3>2.5.5 Análisis multivariable</h3>
+                    <p class="card-text">En muchos casos, es necesario analizar múltiples variables simultáneamente.</p>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="mac-btn close"></span>
+                            <span class="mac-btn min"></span>
+                            <span class="mac-btn max"></span>
+                        </div>
+                        <div class="code-content"><span class="fn">print</span>(df.<span class="fn">corr</span>())</div>
+                    </div>
+                    <p class="card-text">Esto permite evaluar relaciones entre varias variables al mismo tiempo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 4 -->
+        <div class="module-card" onclick="this.classList.toggle('flipped')">
+            <div class="card-flipper">
+                <div class="card-face card-front">
+                    <div class="icon-wrapper">2.5.6</div>
+                    <h2>Ejemplo integrado</h2>
+                    <div class="flip-hint">Dar clic para girar</div>
+                </div>
+                <div class="card-face card-back">
+                    <h3>2.5.6 Ejemplo integrado</h3>
+                    <div class="code-window">
+                        <div class="code-header">
+                            <span class="mac-btn close"></span>
+                            <span class="mac-btn min"></span>
+                            <span class="mac-btn max"></span>
+                        </div>
+                        <div class="code-content"><span class="kw">import</span> pandas <span class="kw">as</span> pd
+                            <span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+                            data = {
+                            <span class="str">"Edad"</span>: [<span class="num">20</span>, <span class="num">25</span>,
+                            <span class="num">30</span>, <span class="num">35</span>, <span class="num">40</span>],
+                            <span class="str">"Ingresos"</span>: [<span class="num">1000</span>, <span
+                                class="num">1500</span>, <span class="num">2000</span>, <span class="num">2500</span>,
+                            <span class="num">3000</span>]
+                            }
+
+                            df = pd.<span class="fn">DataFrame</span>(data)
+
+                            <span class="comment"># Correlación</span>
+                            <span class="fn">print</span>(df.<span class="fn">corr</span>())
+
+                            <span class="comment"># Visualización</span>
+                            plt.<span class="fn">scatter</span>(df[<span class="str">"Edad"</span>], df[<span
+                                class="str">"Ingresos"</span>])
+                            plt.<span class="fn">show</span>()
+                        </div>
+                    </div>
+                    <p class="card-text">Este ejemplo muestra un análisis completo de la relación entre variables.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+
+</html>
