@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas Avanzadas - Tech Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #020617;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(5, 76, 80, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(72, 60, 154, 0.2) 0%, transparent 45%);
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            text-align: left;
+            overflow-x: hidden;
+        }
+
+        @keyframes containerEntrance {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.98);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .carousel-container {
+            width: 100%;
+            max-width: 820px;
+            background: rgba(10, 17, 32, 0.95);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7), 
+                        0 0 0 1px rgba(255, 255, 255, 0.08),
+                        0 0 40px rgba(5, 76, 80, 0.2);
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(5, 76, 80, 0.4);
+            animation: containerEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .carousel-header {
+            padding: 24px 35px 16px 35px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .carousel-instructions {
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 400;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .carousel-instructions::before {
+            content: '';
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #054C50;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #054C50;
+        }
+
+        .carousel-track-container {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            list-style: none;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            padding: 35px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            max-height: 72vh;
+            overflow-y: auto;
+        }
+
+        .carousel-slide::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .carousel-slide::-webkit-scrollbar-thumb {
+            background: rgba(5, 76, 80, 0.5);
+            border-radius: 3px;
+        }
+
+        .carousel-slide.active-slide {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .carousel-slide.active-slide .slide-title {
+            animation: slideElementUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+            opacity: 0;
+        }
+
+        .carousel-slide.active-slide .slide-content-block {
+            animation: slideElementUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideElementUp {
+            0% {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .slide-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 14px;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ffffff 30%, #2dd4bf 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-text {
+            font-size: 13.5px;
+            line-height: 1.5;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+        }
+
+        .slide-list {
+            margin-bottom: 12px;
+            padding-left: 20px;
+            color: #cbd5e1;
+            font-size: 13.5px;
+            line-height: 1.5;
+        }
+
+        .slide-list li {
+            margin-bottom: 6px;
+        }
+
+        .code-box-wrapper {
+            background: rgba(2, 6, 23, 0.85);
+            border: 1px solid rgba(5, 76, 80, 0.5);
+            border-radius: 14px;
+            margin-bottom: 12px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .code-header-bar {
+            background: rgba(15, 23, 42, 0.95);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .code-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .code-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #f59e0b; }
+        .dot-green { background: #10b981; }
+
+        .code-lang {
+            margin-left: 15px;
+            font-size: 11px;
+            color: #2dd4bf;
+            font-family: 'Fira Code', monospace;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .code-box {
+            padding: 14px 18px;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            color: #e2e8f0;
+            overflow-x: auto;
+            line-height: 1.5;
+            text-align: left;
+            min-height: 60px;
+            white-space: pre;
+        }
+
+        .code-keyword { color: #f472b6; font-weight: 500; }
+        .code-string { color: #34d399; }
+        .code-number { color: #fbbf24; }
+        .code-func { color: #38bdf8; }
+
+        .typing-cursor {
+            display: inline-block;
+            width: 7px;
+            height: 13px;
+            background-color: #2dd4bf;
+            vertical-align: middle;
+            margin-left: 2px;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .carousel-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 35px;
+            background: rgba(10, 17, 32, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .indicators {
+            display: flex;
+            gap: 10px;
+        }
+
+        .indicator {
+            width: 24px;
+            height: 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.15);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .indicator.active {
+            width: 36px;
+            background: #054C50;
+            box-shadow: 0 0 12px rgba(5, 76, 80, 0.8);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 14px;
+        }
+
+        .carousel-btn {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(5, 76, 80, 0.6);
+            color: #2dd4bf;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-btn:hover:not(:disabled) {
+            background: #054C50;
+            color: #ffffff;
+            border-color: #2dd4bf;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5, 76, 80, 0.5);
+        }
+
+        .carousel-btn:disabled {
+            background: rgba(10, 17, 32, 0.5);
+            border-color: rgba(255, 255, 255, 0.05);
+            color: #475569;
+            cursor: not-allowed;
+            opacity: 0.5;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .slide-counter {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2dd4bf;
+            font-family: 'Fira Code', monospace;
+            background: rgba(5, 76, 80, 0.2);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(5, 76, 80, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="carousel-container">
+        <div class="carousel-header">
+            <span class="carousel-instructions">Haga clic sobre las flechas para navegar</span>
+            <span class="slide-counter" id="slideCounter">01 / 08</span>
+        </div>
+
+        <div class="carousel-track-container">
+            <ul class="carousel-track" id="carouselTrack">
+                <!-- Slide 1: 1.5.1 Estadísticas básicas con Pandas -->
+                <li class="carousel-slide active-slide" data-index="0">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">1.5.1 Estadísticas básicas con Pandas</h2>
+                        <p class="slide-text">Pandas proporciona funciones integradas para calcular estadísticas descriptivas de forma directa.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-0"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Estas funciones permiten obtener rápidamente medidas de tendencia central.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 2: 1.5.2 Medidas de dispersión en Python -->
+                <li class="carousel-slide" data-index="1">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">1.5.2 Medidas de dispersión en Python</h2>
+                        <p class="slide-text">También es posible calcular medidas de dispersión utilizando funciones específicas.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-1"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Estas métricas permiten analizar la variabilidad de los datos.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 3: 1.5.3 Resumen estadístico completo -->
+                <li class="carousel-slide" data-index="2">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">1.5.3 Resumen estadístico completo</h2>
+                        <p class="slide-text">Pandas permite obtener un resumen completo del conjunto de datos mediante una sola función.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-2"></div>
+                        </div>
+                        <p class="slide-text" style="font-weight: 500; color: #e2e8f0; margin-bottom: 6px;">Este método incluye:</p>
+                        <ul class="slide-list" style="margin-bottom: 0;">
+                            <li>Media.</li>
+                            <li>Desviación estándar.</li>
+                            <li>Valores mínimo y máximo.</li>
+                            <li>Percentiles.</li>
+                        </ul>
+                    </div>
+                </li>
+
+                <!-- Slide 4: 1.5.4 Uso de NumPy para estadísticas -->
+                <li class="carousel-slide" data-index="3">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">1.5.4 Uso de NumPy para estadísticas</h2>
+                        <p class="slide-text">La biblioteca NumPy también ofrece funciones estadísticas eficientes.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-3"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">NumPy es especialmente útil para operaciones numéricas de alto rendimiento.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 5: 1.5.5 Cálculo de correlación -->
+                <li class="carousel-slide" data-index="4">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">1.5.5 Cálculo de correlación</h2>
+                        <p class="slide-text">La correlación permite analizar la relación entre variables.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-4"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Este análisis es clave para identificar relaciones entre variables.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 6: 1.5.6 Análisis por grupos -->
+                <li class="carousel-slide" data-index="5">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">1.5.6 Análisis por grupos</h2>
+                        <p class="slide-text">Pandas permite calcular estadísticas agrupadas mediante la función groupby().</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-5"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Esto permite obtener métricas por categorías.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 7: 1.5.7 Percentiles y cuartiles -->
+                <li class="carousel-slide" data-index="6">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">1.5.7 Percentiles y cuartiles</h2>
+                        <p class="slide-text">Los percentiles permiten analizar la distribución de los datos.</p>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-6"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Estos valores son importantes para detectar dispersión y outliers.</p>
+                    </div>
+                </li>
+
+                <!-- Slide 8: 1.5.8 Ejemplo integrado -->
+                <li class="carousel-slide" data-index="7">
+                    <div class="slide-content-block">
+                        <h2 class="slide-title">1.5.8 Ejemplo integrado</h2>
+                        <div class="code-box-wrapper">
+                            <div class="code-header-bar">
+                                <div class="code-dots">
+                                    <div class="code-dot dot-red"></div>
+                                    <div class="code-dot dot-yellow"></div>
+                                    <div class="code-dot dot-green"></div>
+                                </div>
+                                <span class="code-lang">Python</span>
+                            </div>
+                            <div class="code-box" id="code-7"></div>
+                        </div>
+                        <p class="slide-text" style="margin-bottom: 0;">Este ejemplo resume el uso de múltiples funciones estadísticas.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="carousel-nav">
+            <div class="indicators" id="indicators">
+                <span class="indicator active" data-target="0"></span>
+                <span class="indicator" data-target="1"></span>
+                <span class="indicator" data-target="2"></span>
+                <span class="indicator" data-target="3"></span>
+                <span class="indicator" data-target="4"></span>
+                <span class="indicator" data-target="5"></span>
+                <span class="indicator" data-target="6"></span>
+                <span class="indicator" data-target="7"></span>
+            </div>
+            <div class="nav-buttons">
+                <button class="carousel-btn" id="prevBtn" disabled aria-label="Anterior">&#10094;</button>
+                <button class="carousel-btn" id="nextBtn" aria-label="Siguiente">&#10095;</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const codeContents = [
+            /* Slide 1 */
+            `<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd\n\ndata = {\n    <span class="code-string">"Valores"</span>: [<span class="code-number">10</span>, <span class="code-number">20</span>, <span class="code-number">20</span>, <span class="code-number">30</span>, <span class="code-number">40</span>]\n}\n\ndf = pd.DataFrame(data)\n<span class="code-func">print</span>(<span class="code-string">"Media:"</span>, df[<span class="code-string">"Valores"</span>].<span class="code-func">mean</span>())\n<span class="code-func">print</span>(<span class="code-string">"Mediana:"</span>, df[<span class="code-string">"Valores"</span>].<span class="code-func">median</span>())\n<span class="code-func">print</span>(<span class="code-string">"Moda:"</span>, df[<span class="code-string">"Valores"</span>].<span class="code-func">mode</span>())`,
+            
+            /* Slide 2 */
+            `<span class="code-func">print</span>(<span class="code-string">"Varianza:"</span>, df[<span class="code-string">"Valores"</span>].<span class="code-func">var</span>())\n<span class="code-func">print</span>(<span class="code-string">"Desviación estándar:"</span>, df[<span class="code-string">"Valores"</span>].<span class="code-func">std</span>())\n<span class="code-func">print</span>(<span class="code-string">"Rango:"</span>, df[<span class="code-string">"Valores"</span>].<span class="code-func">max</span>() - df[<span class="code-string">"Valores"</span>].<span class="code-func">min</span>())`,
+
+            /* Slide 3 */
+            `<span class="code-func">print</span>(df.<span class="code-func">describe</span>())`,
+
+            /* Slide 4 */
+            `<span class="code-keyword">import</span> numpy <span class="code-keyword">as</span> np\n\nvalores = [<span class="code-number">10</span>, <span class="code-number">20</span>, <span class="code-number">30</span>, <span class="code-number">40</span>]\n<span class="code-func">print</span>(<span class="code-string">"Media:"</span>, np.<span class="code-func">mean</span>(valores))\n<span class="code-func">print</span>(<span class="code-string">"Desviación estándar:"</span>, np.<span class="code-func">std</span>(valores))`,
+
+            /* Slide 5 */
+            `data = {\n    <span class="code-string">"Edad"</span>: [<span class="code-number">20</span>, <span class="code-number">25</span>, <span class="code-number">30</span>, <span class="code-number">35</span>],\n    <span class="code-string">"Ingresos"</span>: [<span class="code-number">1000</span>, <span class="code-number">1500</span>, <span class="code-number">2000</span>, <span class="code-number">2500</span>]\n}\n\ndf = pd.DataFrame(data)\n<span class="code-func">print</span>(df.<span class="code-func">corr</span>())`,
+
+            /* Slide 6 */
+            `data = {\n    <span class="code-string">"Ciudad"</span>: [<span class="code-string">"Bogotá"</span>, <span class="code-string">"Bogotá"</span>, <span class="code-string">"Cali"</span>],\n    <span class="code-string">"Ventas"</span>: [<span class="code-number">100</span>, <span class="code-number">150</span>, <span class="code-number">200</span>]\n}\n\ndf = pd.DataFrame(data)\n<span class="code-func">print</span>(df.<span class="code-func">groupby</span>(<span class="code-string">"Ciudad"</span>)[<span class="code-string">"Ventas"</span>].<span class="code-func">mean</span>())`,
+
+            /* Slide 7 */
+            `<span class="code-func">print</span>(df[<span class="code-string">"Ventas"</span>].<span class="code-func">quantile</span>(<span class="code-number">0.25</span>)) <span class="code-keyword"># Q1</span>\n<span class="code-func">print</span>(df[<span class="code-string">"Ventas"</span>].<span class="code-func">quantile</span>(<span class="code-number">0.5</span>))  <span class="code-keyword"># Mediana</span>\n<span class="code-func">print</span>(df[<span class="code-string">"Ventas"</span>].<span class="code-func">quantile</span>(<span class="code-number">0.75</span>)) <span class="code-keyword"># Q3</span>`,
+
+            /* Slide 8 */
+            `<span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd\n\ndata = {\n    <span class="code-string">"Valores"</span>: [<span class="code-number">10</span>, <span class="code-number">20</span>, <span class="code-number">20</span>, <span class="code-number">30</span>, <span class="code-number">100</span>]\n}\n\ndf = pd.DataFrame(data)\n<span class="code-func">print</span>(df.<span class="code-func">describe</span>())\n<span class="code-func">print</span>(<span class="code-string">"Media:"</span>, df[<span class="code-string">"Valores"</span>].<span class="code-func">mean</span>())\n<span class="code-func">print</span>(<span class="code-string">"Desviación estándar:"</span>, df[<span class="code-string">"Valores"</span>].<span class="code-func">std</span>())\n<span class="code-func">print</span>(<span class="code-string">"Correlación:"</span>, df.<span class="code-func">corr</span>())`
+        ];
+
+        const track = document.getElementById('carouselTrack');
+        const slides = Array.from(track.children);
+        const nextButton = document.getElementById('nextBtn');
+        const prevButton = document.getElementById('prevBtn');
+        const indicatorsContainer = document.getElementById('indicators');
+        const indicators = Array.from(indicatorsContainer.children);
+        const slideCounter = document.getElementById('slideCounter');
+
+        let currentIndex = 0;
+        const totalSlides = slides.length;
+        let typingTimeouts = {};
+
+        function typeCode(elementId, htmlString, speed = 12) {
+            const container = document.getElementById(elementId);
+            if (!container) return;
+            
+            if (typingTimeouts[elementId]) {
+                clearTimeout(typingTimeouts[elementId]);
+            }
+
+            container.innerHTML = '';
+            
+            let i = 0;
+            let isInsideTag = false;
+            let currentBuiltHtml = '';
+
+            function typeWriter() {
+                if (i < htmlString.length) {
+                    let char = htmlString.charAt(i);
+                    
+                    if (char === '<') {
+                        isInsideTag = true;
+                    }
+                    
+                    currentBuiltHtml += char;
+                    
+                    if (char === '>') {
+                        isInsideTag = false;
+                    }
+
+                    container.innerHTML = currentBuiltHtml + '<span class="typing-cursor"></span>';
+                    
+                    i++;
+                    
+                    let currentSpeed = isInsideTag ? 2 : speed;
+                    if (char === '\n') currentSpeed = speed * 2;
+
+                    typingTimeouts[elementId] = setTimeout(typeWriter, currentSpeed);
+                } else {
+                    container.innerHTML = currentBuiltHtml + '<span class="typing-cursor"></span>';
+                }
+            }
+
+            typeWriter();
+        }
+
+        function updateCarousel(index) {
+            track.style.transform = `translateX(-${index * 100}%)`;
+            
+            slides.forEach((slide, idx) => {
+                if(idx === index) {
+                    slide.classList.add('active-slide');
+                } else {
+                    slide.classList.remove('active-slide');
+                }
+            });
+
+            indicators.forEach((ind, idx) => {
+                if(idx === index) {
+                    ind.classList.add('active');
+                } else {
+                    ind.classList.remove('active');
+                }
+            });
+
+            slideCounter.textContent = `0${index + 1} / 0${totalSlides}`;
+
+            if (index === 0) {
+                prevButton.disabled = true;
+            } else {
+                prevButton.disabled = false;
+            }
+
+            if (index === totalSlides - 1) {
+                nextButton.disabled = true;
+            } else {
+                nextButton.disabled = false;
+            }
+
+            setTimeout(() => {
+                typeCode(`code-${index}`, codeContents[index], 12);
+            }, 250);
+        }
+
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < totalSlides - 1) {
+                currentIndex++;
+                updateCarousel(currentIndex);
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCarousel(currentIndex);
+            }
+        });
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                if (currentIndex !== index) {
+                    currentIndex = index;
+                    updateCarousel(currentIndex);
+                }
+            });
+        });
+
+        updateCarousel(0);
+    </script>
+</body>
+</html>
