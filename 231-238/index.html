@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Identificación de Valores Faltantes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f3f6f9;
+            --text-main: #2d3748;
+            --text-muted: #4a5568;
+            --card-bg: #ffffff;
+            --primary: #3182ce;
+            --primary-light: #ebf8ff;
+            --border-color: #e2e8f0;
+            --code-bg: #f7fafc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 40px 20px;
+            overflow-x: hidden;
+            /* Prevención estricta de corte de palabras a la mitad */
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            hyphens: auto;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 40px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .header-section h1 {
+            font-size: 2.2rem;
+            color: #1a202c;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .instruction-badge {
+            display: inline-block;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid #bee3f8;
+            box-shadow: 0 2px 4px rgba(49, 130, 206, 0.1);
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background-color: transparent;
+            height: 420px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        /* Interacción configurada estrictamente para clic (toggle class 'flipped') */
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            border-radius: 16px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .card-front {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            text-align: center;
+            background: linear-gradient(145deg, #ffffff, #f8fafc);
+        }
+
+        .card-front-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary-light);
+            color: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .card-front h2 {
+            font-size: 1.25rem;
+            color: #2b6cb0;
+            margin-bottom: 15px;
+        }
+
+        .click-hint {
+            font-size: 0.8rem;
+            color: #a0aec0;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 20px;
+        }
+
+        .click-hint::before {
+            content: '👆';
+            font-size: 1rem;
+        }
+
+        .card-back {
+            transform: rotateY(180deg);
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .card-back::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-back::-webkit-scrollbar-thumb {
+            background-color: #cbd5e0;
+            border-radius: 4px;
+        }
+
+        .card-back h3 {
+            font-size: 1.15rem;
+            color: #2b6cb0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        .content-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+        }
+
+        .content-list {
+            padding-left: 20px;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .content-list li {
+            margin-bottom: 6px;
+        }
+
+        .code-block {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 15px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: #1a202c;
+            overflow-x: auto;
+            margin-bottom: 12px;
+            white-space: pre;
+        }
+
+        .kwd { color: #d53f8c; font-weight: 500; }
+        .str { color: #38a169; }
+        .func { color: #3182ce; }
+        .num { color: #dd6b20; }
+        .comment { color: #a0aec0; font-style: italic; }
+
+        .uptc-footer {
+            margin-top: 60px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .uptc-footer strong {
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-section">
+        <div class="instruction-badge">Haga clic en las tarjetas para visualizar el contenido</div>
+    </div>
+
+    <div class="grid-container">
+        
+        <!-- Tarjeta 1 -->
+        <div class="card" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-front-icon">2.3.1</div>
+                    <h2>Tipos de valores faltantes</h2>
+                    <span class="click-hint">Clic para girar</span>
+                </div>
+                <div class="card-back">
+                    <h3>2.3.1 Tipos de valores faltantes</h3>
+                    <p class="content-text">Los valores faltantes pueden clasificarse en diferentes categorías:</p>
+                    <ul class="content-list">
+                        <li>MCAR (Missing Completely at Random): ausencia de datos completamente aleatoria.</li>
+                        <li>MAR (Missing at Random): ausencia relacionada con otras variables.</li>
+                        <li>MNAR (Missing Not at Random): ausencia relacionada con el propio valor faltante.</li>
+                    </ul>
+                    <p class="content-text">Comprender el tipo de valor faltante permite seleccionar la estrategia adecuada para su manejo (Little & Rubin, 2019).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 2 -->
+        <div class="card" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-front-icon">2.3.2</div>
+                    <h2>Identificación de valores faltantes en Python</h2>
+                    <span class="click-hint">Clic para girar</span>
+                </div>
+                <div class="card-back">
+                    <h3>2.3.2 Identificación de valores faltantes en Python</h3>
+                    <p class="content-text">Pandas proporciona herramientas sencillas para detectar valores nulos.</p>
+                    <div class="code-block">
+<span class="kwd">import</span> pandas <span class="kwd">as</span> pd
+
+df = pd.<span class="func">read_csv</span>(<span class="str">"datos.csv"</span>)
+<span class="func">print</span>(df.<span class="func">isnull</span>())</div>
+                    <p class="content-text">Conteo de valores faltantes por columna:</p>
+                    <div class="code-block">
+<span class="func">print</span>(df.<span class="func">isnull</span>().<span class="func">sum</span>())</div>
+                    <p class="content-text">Esto permite identificar rápidamente qué variables presentan datos incompletos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 3 -->
+        <div class="card" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-front-icon">2.3.3</div>
+                    <h2>Visualización de valores faltantes</h2>
+                    <span class="click-hint">Clic para girar</span>
+                </div>
+                <div class="card-back">
+                    <h3>2.3.3 Visualización de valores faltantes</h3>
+                    <p class="content-text">También es posible analizar la proporción de valores faltantes.</p>
+                    <div class="code-block">
+<span class="func">print</span>(df.<span class="func">isnull</span>().<span class="func">mean</span>() * <span class="num">100</span>)</div>
+                    <p class="content-text">Este cálculo muestra el porcentaje de datos faltantes por columna, lo cual es útil para evaluar su impacto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 4 -->
+        <div class="card" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-front-icon">2.3.4</div>
+                    <h2>Identificación de valores no nulos</h2>
+                    <span class="click-hint">Clic para girar</span>
+                </div>
+                <div class="card-back">
+                    <h3>2.3.4 Identificación de valores no nulos</h3>
+                    <p class="content-text">Para complementar el análisis, se pueden identificar los valores presentes.</p>
+                    <div class="code-block">
+<span class="func">print</span>(df.<span class="func">notnull</span>().<span class="func">sum</span>())</div>
+                    <p class="content-text">Esto permite comparar datos disponibles frente a datos faltantes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 5 -->
+        <div class="card" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-front-icon">2.3.5</div>
+                    <h2>Detección de valores inconsistentes</h2>
+                    <span class="click-hint">Clic para girar</span>
+                </div>
+                <div class="card-back">
+                    <h3>2.3.5 Detección de valores inconsistentes</h3>
+                    <p class="content-text">En algunos casos, los valores faltantes no aparecen como nulos explícitos, sino como valores incorrectos (por ejemplo, cadenas vacías o símbolos).</p>
+                    <div class="code-block">
+<span class="func">print</span>(df[<span class="str">"Edad"</span>].<span class="func">unique</span>())</div>
+                    <p class="content-text">Esto permite detectar valores como:</p>
+                    <ul class="content-list">
+                        <li>"NA"</li>
+                        <li>"" (vacíos)</li>
+                        <li>Valores fuera de rango</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 6 -->
+        <div class="card" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-front-icon">2.3.6</div>
+                    <h2>Ejemplo integrado</h2>
+                    <span class="click-hint">Clic para girar</span>
+                </div>
+                <div class="card-back">
+                    <h3>2.3.6 Ejemplo integrado</h3>
+                    <div class="code-block">
+<span class="kwd">import</span> pandas <span class="kwd">as</span> pd
+
+data = {
+    <span class="str">"Nombre"</span>: [<span class="str">"Ana"</span>, <span class="str">"Luis"</span>, <span class="kwd">None</span>, <span class="str">"Carlos"</span>],
+    <span class="str">"Edad"</span>: [<span class="num">23</span>, <span class="kwd">None</span>, <span class="num">35</span>, <span class="num">40</span>]
+}
+
+df = pd.<span class="func">DataFrame</span>(data)
+<span class="func">print</span>(<span class="str">"Valores nulos:"</span>)
+<span class="func">print</span>(df.<span class="func">isnull</span>().<span class="func">sum</span>())
+<span class="func">print</span>(<span class="str">"Porcentaje de nulos:"</span>)
+<span class="func">print</span>(df.<span class="func">isnull</span>().<span class="func">mean</span>() * <span class="num">100</span>)</div>
+                    <p class="content-text">Este ejemplo muestra cómo identificar valores faltantes en diferentes columnas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 7 -->
+        <div class="card" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-front-icon">2.3.7</div>
+                    <h2>Impacto de los valores faltantes</h2>
+                    <span class="click-hint">Clic para girar</span>
+                </div>
+                <div class="card-back">
+                    <h3>2.3.7 Impacto de los valores faltantes</h3>
+                    <p class="content-text">La presencia de valores faltantes puede generar:</p>
+                    <ul class="content-list">
+                        <li>Sesgos en el análisis.</li>
+                        <li>Pérdida de información.</li>
+                        <li>Errores en modelos predictivos.</li>
+                        <li>Resultados inconsistentes.</li>
+                    </ul>
+                    <p class="content-text">Por esta razón, su identificación es un paso crítico en el análisis de datos (James, Witten, Hastie & Tibshirani, 2021).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta 8 -->
+        <div class="card" onclick="this.classList.toggle('flipped')">
+            <div class="card-inner">
+                <div class="card-front">
+                    <div class="card-front-icon">2.3.8</div>
+                    <h2>Buenas prácticas en la identificación</h2>
+                    <span class="click-hint">Clic para girar</span>
+                </div>
+                <div class="card-back">
+                    <h3>2.3.8 Buenas prácticas en la identificación</h3>
+                    <p class="content-text">Para una correcta identificación de valores faltantes, se recomienda:</p>
+                    <ul class="content-list">
+                        <li>Revisar los tipos de datos.</li>
+                        <li>Analizar porcentajes de valores nulos.</li>
+                        <li>Identificar valores inconsistentes.</li>
+                        <li>Documentar los hallazgos.</li>
+                    </ul>
+                    <p class="content-text">Estas prácticas permiten mejorar la calidad del análisis.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="uptc-footer">
+        <p>Desarrollado para la <strong>Universidad Pedagógica y Tecnológica de Colombia (UPTC)</strong></p>
+    </div>
+
+</body>
+</html>
