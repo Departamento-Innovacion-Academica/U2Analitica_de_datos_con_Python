@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualización de Datos con Seaborn</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Estilos Base - Estilo Apple Light Avanzado */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background-color: #fbfbfd;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Barra de Progreso Superior */
+        .scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #0066cc, #2997ff);
+            width: 0%;
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+        }
+
+        /* Indicador Lateral Interactivo de Secciones (Estilo Apple) */
+        .side-pagination {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .side-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+        }
+
+        .side-dot.active {
+            background-color: #0066cc;
+            transform: scale(1.4);
+            box-shadow: 0 0 10px rgba(0, 102, 204, 0.4);
+        }
+
+        /* Encabezado Centrado Estilo Apple Hero */
+        .intro-header {
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .intro-header h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            background: linear-gradient(180deg, #1d1d1f 0%, #434346 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInHero 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes fadeInHero {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Instrucción Flotante Fija */
+        .floating-instruction {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 12px 26px;
+            border-radius: 35px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        .floating-instruction span {
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            color: #86868b;
+            text-transform: uppercase;
+        }
+
+        /* Icono del Mouse */
+        .mouse-icon {
+            width: 22px;
+            height: 36px;
+            border: 2px solid #1d1d1f;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .mouse-wheel {
+            width: 4px;
+            height: 8px;
+            background-color: #0066cc;
+            border-radius: 2px;
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: scrollWheel 1.6s infinite ease-in-out;
+        }
+
+        @keyframes scrollWheel {
+            0% { top: 6px; opacity: 1; }
+            50% { top: 14px; opacity: 0.2; }
+            100% { top: 6px; opacity: 1; }
+        }
+
+        /* Contenedor del Scroll */
+        .zoom-scroll-container {
+            width: 100%;
+            max-width: 950px;
+            margin: 0 auto;
+            padding: 0 30px 20vh 30px;
+        }
+
+        /* Contenedor Sticky con separación amplia */
+        .card-wrapper {
+            position: sticky;
+            top: 15vh;
+            height: 70vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 95vh;
+        }
+
+        /* Tarjeta Estilo Apple con salida limpia para evitar que quede atrás */
+        .card {
+            background: #ffffff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 28px;
+            padding: 45px;
+            width: 100%;
+            max-height: 70vh;
+            overflow-y: auto;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.02);
+            
+            /* Animación controlada por Scroll con salida rápida */
+            animation: appleFadeZoom both;
+            animation-timeline: view();
+            animation-range: entry 15% exit 85%; 
+            animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes appleFadeZoom {
+            0% {
+                transform: scale(0.75) translateY(120px);
+                opacity: 0;
+                visibility: hidden;
+            }
+            25% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            75% {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+                visibility: visible;
+            }
+            100% {
+                transform: scale(0.8) translateY(-120px);
+                opacity: 0;
+                visibility: hidden;
+            }
+        }
+
+        /* Personalización de la barra de desplazamiento interna de las tarjetas */
+        .card::-webkit-scrollbar {
+            width: 6px;
+        }
+        .card::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .card::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .card::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* Títulos de sección */
+        .card h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            margin-bottom: 18px;
+            text-align: left;
+            letter-spacing: -0.01em;
+        }
+
+        /* Estilo de Párrafos y Listas */
+        .card p, .card li {
+            font-size: 1.05rem;
+            font-weight: 400;
+            line-height: 1.7;
+            color: #424245;
+            text-align: left;
+            margin-bottom: 14px;
+        }
+
+        .card ul {
+            margin-left: 20px;
+            margin-bottom: 14px;
+        }
+
+        /* Bloques de código simulados estilo consola macOS */
+        .code-block {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            padding: 20px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin: 18px 0;
+            text-align: left;
+            overflow-x: auto;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5), 0 10px 25px rgba(0,0,0,0.15);
+            position: relative;
+        }
+
+        /* Simulación de botones de ventana macOS en el bloque de código */
+        .code-block::before {
+            content: "";
+            display: block;
+            height: 12px;
+            width: 44px;
+            background: radial-gradient(circle, #ff5f56 4px, transparent 4px),
+                        radial-gradient(circle, #ffbd2e 4px, transparent 4px),
+                        radial-gradient(circle, #27c93f 4px, transparent 4px);
+            background-size: 12px 12px;
+            background-position: 0 0, 16px 0, 32px 0;
+            background-repeat: no-repeat;
+            margin-bottom: 14px;
+            opacity: 0.8;
+        }
+
+        .code-keyword { color: #569cd6; }
+        .code-string { color: #ce9178; }
+        .code-number { color: #b5cea8; }
+
+        /* Pie de página */
+        .outro-footer {
+            height: 40vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #86868b;
+            font-size: 0.9rem;
+            background: linear-gradient(180deg, transparent, rgba(0,0,0,0.02));
+        }
+
+        /* Diseño Adaptativo para Móviles */
+        @media (max-width: 768px) {
+            .intro-header h1 {
+                font-size: 2.8rem;
+            }
+            .side-pagination {
+                display: none;
+            }
+            .card-wrapper {
+                padding: 0 10px;
+            }
+            .card {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <div class="side-pagination" id="sidePagination"></div>
+
+    <div class="floating-instruction" id="floatingInstruction">
+        <div class="mouse-icon">
+            <div class="mouse-wheel"></div>
+        </div>
+        <span>Haga scroll para explorar los contenidos</span>
+    </div>
+
+    <header class="intro-header">
+        <h1>Visualización de Datos<br>con Seaborn</h1>
+    </header>
+
+    <main class="zoom-scroll-container">
+
+        <div class="card-wrapper">
+            <div class="card">
+                <h2>3.3.1 Importación y configuración básica</h2>
+                <p>Para utilizar Seaborn, es necesario importar la biblioteca.</p>
+                <div class="code-block">
+                    <span class="code-keyword">import</span> seaborn <span class="code-keyword">as</span> sns<br>
+                    <span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt
+                </div>
+            </div>
+        </div>
+
+        <div class="card-wrapper">
+            <div class="card">
+                <h2>3.3.2 Gráfico de dispersión (scatterplot)</h2>
+                <p>Seaborn permite crear gráficos de dispersión de manera sencilla, incorporando automáticamente estilos visuales.</p>
+                <div class="code-block">
+                    <span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd<br><br>
+                    data = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Edad"</span>: [<span class="code-number">20</span>, <span class="code-number">25</span>, <span class="code-number">30</span>, <span class="code-number">35</span>, <span class="code-number">40</span>],<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Ingresos"</span>: [<span class="code-number">1000</span>, <span class="code-number">1500</span>, <span class="code-number">2000</span>, <span class="code-number">2500</span>, <span class="code-number">3000</span>]<br>
+                    }<br><br>
+                    df = pd.DataFrame(data)<br>
+                    sns.scatterplot(x=<span class="code-string">"Edad"</span>, y=<span class="code-string">"Ingresos"</span>, data=df)<br>
+                    plt.title(<span class="code-string">"Relación entre Edad e Ingresos"</span>)<br>
+                    plt.show()
+                </div>
+                <p>Este tipo de gráfico permite analizar relaciones entre variables (James et al., 2021).</p>
+            </div>
+        </div>
+
+        <div class="card-wrapper">
+            <div class="card">
+                <h2>3.3.3 Histograma con distribución</h2>
+                <p>Seaborn facilita la visualización de distribuciones mediante histogramas mejorados.</p>
+                <div class="code-block">
+                    sns.histplot(df[<span class="code-string">"Edad"</span>], kde=<span class="code-keyword">True</span>)<br>
+                    plt.title(<span class="code-string">"Distribución de edades"</span>)<br>
+                    plt.show()
+                </div>
+                <p>La opción kde=True permite visualizar la densidad de los datos, lo cual mejora la interpretación.</p>
+            </div>
+        </div>
+
+        <div class="card-wrapper">
+            <div class="card">
+                <h2>3.3.4 Gráfico de caja (boxplot)</h2>
+                <p>El boxplot permite identificar la dispersión de los datos y detectar valores atípicos.</p>
+                <div class="code-block">
+                    sns.boxplot(x=df[<span class="code-string">"Edad"</span>])<br>
+                    plt.title(<span class="code-string">"Boxplot de edades"</span>)<br>
+                    plt.show()
+                </div>
+                <p>Este tipo de gráfico es ampliamente utilizado para detectar outliers (Bruce, Bruce & Gedeck, 2020).</p>
+            </div>
+        </div>
+
+        <div class="card-wrapper">
+            <div class="card">
+                <h2>3.3.5 Gráfico de barras</h2>
+                <p>Seaborn también permite generar gráficos de barras más estilizados.</p>
+                <div class="code-block">
+                    data = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Ciudad"</span>: [<span class="code-string">"Bogotá"</span>, <span class="code-string">"Cali"</span>, <span class="code-string">"Medellín"</span>],<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Ventas"</span>: [<span class="code-number">200</span>, <span class="code-number">150</span>, <span class="code-number">180</span>]<br>
+                    }<br><br>
+                    df = pd.DataFrame(data)<br>
+                    sns.barplot(x=<span class="code-string">"Ciudad"</span>, y=<span class="code-string">"Ventas"</span>, data=df)<br>
+                    plt.title(<span class="code-string">"Ventas por ciudad"</span>)<br>
+                    plt.show()
+                </div>
+            </div>
+        </div>
+
+        <div class="card-wrapper">
+            <div class="card">
+                <h2>3.3.6 Matriz de correlación (heatmap)</h2>
+                <p>Uno de los gráficos más útiles en EDA es el mapa de calor para visualizar correlaciones.</p>
+                <div class="code-block">
+                    corr = df.corr()<br>
+                    sns.heatmap(corr, annot=<span class="code-keyword">True</span>)<br>
+                    plt.title(<span class="code-string">"Matriz de correlación"</span>)<br>
+                    plt.show()
+                </div>
+                <p>Este gráfico permite identificar relaciones entre múltiples variables de forma visual (Kuhn & Johnson, 2019).</p>
+            </div>
+        </div>
+
+        <div class="card-wrapper">
+            <div class="card">
+                <h2>3.3.7 Ventajas de Seaborn</h2>
+                <p>El uso de Seaborn ofrece varias ventajas:</p>
+                <ul>
+                    <li>Gráficos más estéticos por defecto.</li>
+                    <li>Integración con pandas.</li>
+                    <li>Facilidad para representar relaciones estadísticas.</li>
+                    <li>Menor cantidad de código.</li>
+                </ul>
+                <p>Estas características facilitan el análisis visual de los datos (Waskom, 2021).</p>
+            </div>
+        </div>
+
+        <div class="card-wrapper">
+            <div class="card">
+                <h2>3.3.8 Ejemplo integrado</h2>
+                <div class="code-block">
+                    <span class="code-keyword">import</span> pandas <span class="code-keyword">as</span> pd<br>
+                    <span class="code-keyword">import</span> seaborn <span class="code-keyword">as</span> sns<br>
+                    <span class="code-keyword">import</span> matplotlib.pyplot <span class="code-keyword">as</span> plt<br><br>
+                    data = {<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Edad"</span>: [<span class="code-number">20</span>, <span class="code-number">25</span>, <span class="code-number">30</span>, <span class="code-number">35</span>, <span class="code-number">40</span>],<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-string">"Ingresos"</span>: [<span class="code-number">1000</span>, <span class="code-number">1500</span>, <span class="code-number">2000</span>, <span class="code-number">2500</span>, <span class="code-number">3000</span>]<br>
+                    }<br><br>
+                    df = pd.DataFrame(data)<br>
+                    sns.scatterplot(x=<span class="code-string">"Edad"</span>, y=<span class="code-string">"Ingresos"</span>, data=df)<br>
+                    sns.lineplot(x=<span class="code-string">"Edad"</span>, y=<span class="code-string">"Ingresos"</span>, data=df)<br>
+                    plt.show()
+                </div>
+                <p>Este ejemplo muestra cómo combinar diferentes tipos de visualización.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="outro-footer">
+        <p>Copyright © 2026 — Análisis de Datos con Python y Seaborn.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const wrappers = document.querySelectorAll('.card-wrapper');
+            const paginationContainer = document.getElementById('sidePagination');
+            const progressBar = document.getElementById('scrollProgress');
+            const floatingInstruction = document.getElementById('floatingInstruction');
+
+            // Crear puntos de navegación lateral dinámicamente según las tarjetas
+            wrappers.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('side-dot');
+                if (index === 0) dot.classList.add('active');
+                paginationContainer.appendChild(dot);
+            });
+
+            const dots = document.querySelectorAll('.side-dot');
+
+            // Actualizar barra de progreso superior y ocultar indicador inicial al hacer scroll
+            window.addEventListener('scroll', () => {
+                const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+                const currentScroll = window.scrollY;
+                const progress = (currentScroll / totalHeight) * 100;
+                progressBar.style.width = progress + '%';
+
+                if (currentScroll > 150) {
+                    floatingInstruction.style.opacity = '0';
+                } else {
+                    floatingInstruction.style.opacity = '1';
+                }
+
+                // Detectar qué tarjeta está activa en pantalla para actualizar los puntos laterales
+                wrappers.forEach((wrapper, index) => {
+                    const rect = wrapper.getBoundingClientRect();
+                    const windowHeight = window.innerHeight;
+                    
+                    if (rect.top <= windowHeight * 0.5 && rect.bottom >= windowHeight * 0.5) {
+                        dots.forEach(d => d.classList.remove('active'));
+                        if (dots[index]) dots[index].classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
